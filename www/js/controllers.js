@@ -1,12 +1,9 @@
-angular.module('ionic.example', ['ionic'])
+angular.module('ionic.example.controllers', [])
 
-.controller('MapCtrl', function($scope, $ionicLoading) {
+.controller('MapCtrl', function($scope, $ionicLoading, ShopService) {
   function initialize() {
-    var data = new Array();
-    data.push({ z: 35.665270,   x: 139.712330,   content: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"});
-    data.push({ z: 35.66231350, x: 139.70742530, content: "fuge"});
-    data.push({ z: 35.66726010, x: 139.70893330, content: "fuga"});
-    data.push({ z: 35.66358290, x: 139.71174990, content: "muga"});
+    var data = ShopService.all();
+    console.log("data:" + data);
     var latlng = new google.maps.LatLng(35.665270, 139.712330);
     var mapOptions = {
       center: latlng,
