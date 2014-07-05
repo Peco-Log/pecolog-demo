@@ -1,5 +1,10 @@
-angular.module('ionic.example', ['ionic'])
-
+angular.module('ionic.example', ['ionic','ionic.example.services'])
+.controller('MenuController', function ($scope, $ionicSideMenuDelegate, MenuService) {
+  $scope.list = MenuService.all();
+  $scope.openLeft = function () {
+    $ionicSideMenuDelegate.toggleLeft();
+  };
+})
 .controller('MapCtrl', function($scope, $http, $ionicLoading, $ionicActionSheet) {
   function initialize() {
     $http.get("https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/shop/-;").success(function(json){
@@ -28,11 +33,8 @@ angular.module('ionic.example', ['ionic'])
           icon: img
         });
         var infowindow = new google.maps.InfoWindow({
-          //content: "<div class='message'>" + data[i].content + "</div>",
           content: data[i].content + ":" + data[i].comment,
           position: new google.maps.LatLng(data[i].z, data[i].x),
-          //position: data[i].position
-          //size: new google.maps.Size(50, 50)
           disableAutoPan: true
         });
         attachMessage(marker, infowindow);
