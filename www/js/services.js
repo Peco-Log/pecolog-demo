@@ -1,4 +1,4 @@
-angular.module('ionic.example.services', [])
+angular.module('pecologApp.services', [])
 
 .factory('MenuService', function () {
   var menuItems = [

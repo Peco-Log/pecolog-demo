@@ -1,11 +1,11 @@
-angular.module('ionic.example', ['ionic','ionic.example.services'])
+angular.module('pecologApp', ['ionic','pecologApp.services'])
 .controller('MenuController', function ($scope, $ionicSideMenuDelegate, MenuService) {
   $scope.list = MenuService.all();
   $scope.openLeft = function () {
     $ionicSideMenuDelegate.toggleLeft();
   };
 })
-.controller('MapCtrl', function($scope, $http, $ionicLoading, $ionicActionSheet) {
+.controller('MapController', function($scope, $http, $ionicLoading, $ionicActionSheet) {
   function initialize() {
     $http.get("https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/shop/-;").success(function(json){
       var data = new Array();
