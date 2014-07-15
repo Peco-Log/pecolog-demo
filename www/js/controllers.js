@@ -1,4 +1,4 @@
-angular.module('pecologApp', ['ionic','pecologApp.services'])
+angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
 .controller('MenuController', function ($scope, $ionicSideMenuDelegate, MenuService) {
   $scope.list = MenuService.all();
   $scope.openLeft = function () {
@@ -6,7 +6,7 @@ angular.module('pecologApp', ['ionic','pecologApp.services'])
   };
 })
 .controller('MapController', function($scope, $http, $ionicLoading, $ionicActionSheet) {
-  function initialize() {
+  var initialize = function() {
     $http.get("https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/shop/-;").success(function(json){
       var data = new Array();
       data.push({ z: json._objs[0]._coord[1],   x: json._objs[0]._coord[0],   content: json._objs[0].name,  comment: "うまい！"});
@@ -46,20 +46,20 @@ angular.module('pecologApp', ['ionic','pecologApp.services'])
       });
 
       $scope.map = map;
+      $scope.img = img;
       //$scope.marker = marker;
       //$scope.infowindow = infowindow;
     });
   }
   google.maps.event.addDomListener(window, 'load', initialize);
 
-  function attachMessage(marker, infowindow, ionicActionSheet) {
+  var attachMessage = function(marker, infowindow, ionicActionSheet) {
     google.maps.event.addListener(marker, "click", function() {
       var contents = infowindow.getContent().split(":");
       $ionicActionSheet.show({
         titleText: contents[0],
         buttons: [
           { text: contents[1]},
-          //{ text: 'Share <i class="icon ion-share"></i>' },
           //{ text: 'Move <i class="icon ion-arrow-move"></i>' },
         ],
         //destructiveText: 'Delete',
@@ -90,7 +90,20 @@ angular.module('pecologApp', ['ionic','pecologApp.services'])
     });
 
     navigator.geolocation.getCurrentPosition(function(pos) {
-      $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+      var latlng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+      var marker = new google.maps.Marker({
+        position: latlng, /* マーカーを立てる場所の緯度・経度 */ 
+        map: $scope.map, /*マーカーを配置する地図オブジェクト */
+        icon: $scope.img
+      });
+      var infowindow = new google.maps.InfoWindow({
+        content: "もう:つらい",
+        position: latlng,
+        disableAutoPan: true
+      });
+      attachMessage(marker, infowindow);
+      google.maps.event.addDomListener(window, 'load', initialize);
+      $scope.map.setCenter(latlng);
       $scope.loading.hide();
     }, function(error) {
       alert('Unable to get location: ' + error.message);
