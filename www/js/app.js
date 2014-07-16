@@ -10,6 +10,12 @@ app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $u
         templateUrl: "templates/map.html",
         controller: "MapController"
       }
+    },
+    resolve: {
+      ShopService: 'ShopService',
+      shops: function (ShopService) {
+        return ShopService.all().$promise;
+      }
     }
   });
 }]);
