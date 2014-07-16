@@ -13,6 +13,12 @@ angular.module('pecologApp.services', [])
     }
   }
 })
-;
 
-
+.factory('ShopService', function ($resource, $q) {
+  var SHOP_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/shop/';
+  return {
+    all: function () {
+      return $resource(SHOP_BASE_URL + '-', {get: {method: 'GET'}}).get();
+    }
+  }
+});
