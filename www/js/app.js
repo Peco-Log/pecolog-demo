@@ -7,7 +7,7 @@ app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $u
     url: "^/map",
     views: {
       contentView: {
-        templateUrl: "templates/map.html",
+        templateUrl: "templates/map.tmpl.html",
         controller: "MapController"
       }
     },
@@ -15,6 +15,24 @@ app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $u
       ShopService: 'ShopService',
       shops: function (ShopService) {
         return ShopService.all().$promise;
+      }
+    }
+  })
+  .state("avatars", {
+    url: "^/avatars",
+    views: {
+      contentView: {
+        templateUrl: "templates/avatars.tmpl.html",
+        controller: "AvatarsController"
+      }
+    }
+  })
+  .state("aboutUs", {
+    url: "^/aboutUs",
+    views: {
+      contentView: {
+        templateUrl: "templates/aboutUs.tmpl.html",
+        controller: "AboutUsController"
       }
     }
   });
