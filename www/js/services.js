@@ -10,7 +10,7 @@ angular.module('pecologApp.services', [])
     all: function () {
       return menuItems;
     }
-  }
+  };
 })
 
 .factory('ShopService', function ($resource, $q) {
@@ -19,5 +19,5 @@ angular.module('pecologApp.services', [])
     all: function () {
       return $resource(SHOP_BASE_URL + '-', {get: {method: 'GET'}}).get();
     }
-  }
+  };
 });

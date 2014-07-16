@@ -11,8 +11,8 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
 .controller('MapController', function($scope, $ionicLoading, $ionicActionSheet, shops) {
   var initialize = function() {
 
-    var markerDataList = new Array();
-    var comments = ["うまい", "まずい"]
+    var markerDataList = [];
+    var comments = ['うまい', 'まずい'];
     _(shops._objs).each(function(shop) {
       markerDataList.push({ z: shop._coord[1],   x: shop._coord[0],   content: shop.name,  comment: comments.shift() });
     });
@@ -57,7 +57,7 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       $scope.img = img;
       //$scope.marker = marker;
       //$scope.infowindow = infowindow;
-  }
+  };
   google.maps.event.addDomListener(window, 'load', initialize);
 
   var attachMessage = function(marker, infowindow, ionicActionSheet) {
@@ -74,7 +74,7 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
         }
       });
     });
-  }
+  };
 
   $scope.centerOnMe = function() {
     if(!$scope.map) {
