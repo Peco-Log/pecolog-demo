@@ -5,14 +5,14 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     $ionicSideMenuDelegate.toggleLeft();
   };
 })
-.controller('MapController', function($scope, $http, $resource, $ionicLoading, $ionicActionSheet) {
+.controller('MapController', function($scope, $ionicLoading, $ionicActionSheet, shops) {
   var initialize = function() {
-    var json = $resource("https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/shop/-;",
-      {get: {method: 'GET'}}).get();
+
     var data = new Array();
-    data.push({ z: json._objs[0]._coord[1],   x: json._objs[0]._coord[0],   content: json._objs[0].name,  comment: "うまい！"});
-    data.push({ z: json._objs[1]._coord[1],   x: json._objs[1]._coord[0],   content: json._objs[1].name,  comment: "まずい！"});
-    var latlng = new google.maps.LatLng(json._objs[0]._coord[1], json._objs[0]._coord[0]);
+    data.push({ z: shops._objs[0]._coord[1],   x: shops._objs[0]._coord[0],   content: shops._objs[0].name,  comment: "うまい！"});
+    data.push({ z: shops._objs[1]._coord[1],   x: shops._objs[1]._coord[0],   content: shops._objs[1].name,  comment: "まずい！"});
+
+    var latlng = new google.maps.LatLng(shops._objs[0]._coord[1], shops._objs[0]._coord[0]);
     var mapOptions = {
       center: latlng,
       zoom: 16,
