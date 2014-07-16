@@ -1,8 +1,11 @@
 angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
 .controller('MenuController', function ($scope, $ionicSideMenuDelegate, MenuService) {
   $scope.list = MenuService.all();
-  $scope.openLeft = function () {
+  $scope.toggleLeftSideMenu = function() {
     $ionicSideMenuDelegate.toggleLeft();
+  };
+  $scope.closeMenu = function () {
+    $ionicSideMenuDelegate.isOpen();
   };
 })
 .controller('MapController', function($scope, $ionicLoading, $ionicActionSheet, shops) {
@@ -50,10 +53,10 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       return false;
     });
 
-    $scope.map = map;
-    $scope.img = img;
-    //$scope.marker = marker;
-    //$scope.infowindow = infowindow;
+      $scope.map = map;
+      $scope.img = img;
+      //$scope.marker = marker;
+      //$scope.infowindow = infowindow;
   }
   google.maps.event.addDomListener(window, 'load', initialize);
 
@@ -64,53 +67,48 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
         titleText: contents[0],
         buttons: [
           { text: contents[1]},
-          //{ text: 'Move <i class="icon ion-arrow-move"></i>' },
         ],
-          //destructiveText: 'Delete',
-          //cancelText: 'Cancel',
-          //cancel: function() {
-          //  console.log('CANCELLED');
-          //},
-          //buttonClicked: function(index) {
-          //  console.log('BUTTON CLICKED', index);
-          //  return true;
-          //},
-          destructiveButtonClicked: function() {
-            console.log('DESTRUCT');
-            return true;
-          }
-        });
+        destructiveButtonClicked: function() {
+          console.log('DESTRUCT');
+          return true;
+        }
       });
+    });
+  }
+
+  $scope.centerOnMe = function() {
+    if(!$scope.map) {
+      return;
     }
 
-    $scope.centerOnMe = function() {
-      if(!$scope.map) {
-        return;
-      }
+    $scope.loading = $ionicLoading.show({
+      content: 'Getting current location...',
+      showBackdrop: false
+    });
 
-      $scope.loading = $ionicLoading.show({
-        content: 'Getting current location...',
-        showBackdrop: false
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      var latlng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+      var marker = new google.maps.Marker({
+        position: latlng, /* マーカーを立てる場所の緯度・経度 */ 
+        map: $scope.map, /*マーカーを配置する地図オブジェクト */
+        icon: $scope.img
       });
-
-      navigator.geolocation.getCurrentPosition(function(pos) {
-        var latlng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-        var marker = new google.maps.Marker({
-          position: latlng, /* マーカーを立てる場所の緯度・経度 */ 
-          map: $scope.map, /*マーカーを配置する地図オブジェクト */
-          icon: $scope.img
-        });
-        var infowindow = new google.maps.InfoWindow({
-          content: "I'm here:Hi!",
-          position: latlng,
-          disableAutoPan: true
-        });
-        attachMessage(marker, infowindow);
-        google.maps.event.addDomListener(window, 'load', initialize);
-        $scope.map.setCenter(latlng);
-        $scope.loading.hide();
-      }, function(error) {
-        alert('Unable to get location: ' + error.message);
+      var infowindow = new google.maps.InfoWindow({
+        content: "I'm here:Hi!",
+        position: latlng,
+        disableAutoPan: true
       });
-    };
-  });
+      attachMessage(marker, infowindow);
+      google.maps.event.addDomListener(window, 'load', initialize);
+      $scope.map.setCenter(latlng);
+      $scope.loading.hide();
+    }, function(error) {
+      alert('Unable to get location: ' + error.message);
+    });
+  };
+})
+.controller('AvatarsController', function ($scope) {
+})
+.controller('AboutUsController', function ($scope) {
+})
+;

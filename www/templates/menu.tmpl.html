@@ -1,5 +1,5 @@
 <ul class="list">
-    <a href="{{item.link}}" class="item item-icon-left app-side-menu tech-font" ng-repeat="item in list"
+    <a ui-sref="{{item.link}}" class="item item-icon-left app-side-menu tech-font" ng-repeat="item in list"
        ng-class="item.colour">
         <i ng-class="item.iconClass"></i>
         {{item.text}}
