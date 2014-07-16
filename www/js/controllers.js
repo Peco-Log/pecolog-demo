@@ -8,9 +8,11 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
 .controller('MapController', function($scope, $ionicLoading, $ionicActionSheet, shops) {
   var initialize = function() {
 
-    var data = new Array();
-    data.push({ z: shops._objs[0]._coord[1],   x: shops._objs[0]._coord[0],   content: shops._objs[0].name,  comment: "うまい！"});
-    data.push({ z: shops._objs[1]._coord[1],   x: shops._objs[1]._coord[0],   content: shops._objs[1].name,  comment: "まずい！"});
+    var markerDataList = new Array();
+    var comments = ["うまい", "まずい"]
+    _(shops._objs).each(function(shop) {
+      markerDataList.push({ z: shop._coord[1],   x: shop._coord[0],   content: shop.name,  comment: comments.shift() });
+    });
 
     var latlng = new google.maps.LatLng(shops._objs[0]._coord[1], shops._objs[0]._coord[0]);
     var mapOptions = {
@@ -26,20 +28,22 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       new google.maps.Point(0, 0),
       new google.maps.Point(25.0, 60.0)
     );
-    for (i = 0; i < data.length; i++) {
+
+    _(markerDataList).each(function(markerData) {
       var marker = new google.maps.Marker({
         //position: data[i].position, /* マーカーを立てる場所の緯度・経度 */
-        position: new google.maps.LatLng(data[i].z, data[i].x),
+        position: new google.maps.LatLng(markerData.z, markerData.x),
         map: map, /*マーカーを配置する地図オブジェクト */
         icon: img
       });
       var infowindow = new google.maps.InfoWindow({
-        content: data[i].content + ":" + data[i].comment,
-        position: new google.maps.LatLng(data[i].z, data[i].x),
+        content: markerData.content + ":" + markerData.comment,
+        position: new google.maps.LatLng(markerData.z, markerData.x),
         disableAutoPan: true
       });
       attachMessage(marker, infowindow);
-    }
+    });
+
     // Stop the side bar from dragging when mousedown/tapdown on the map
     google.maps.event.addDomListener(document.getElementById('map'), 'mousedown', function(e) {
       e.preventDefault();
