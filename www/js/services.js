@@ -12,7 +12,6 @@ angular.module('pecologApp.services', [])
     }
   };
 })
-
 .factory('ShopService', function ($resource, $q) {
   var SHOP_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/shop/';
   return {
@@ -20,4 +19,14 @@ angular.module('pecologApp.services', [])
       return $resource(SHOP_BASE_URL + '-', {get: {method: 'GET'}}).get();
     }
   };
+})
+.factory('AvatarsService', function () {
+  var avatars = [
+    { img: 'http://ionicframework.com/img/docs/venkman.jpg', name: 'Venkman', mention: "Back off, man. I'm a scientist."},
+    { img: 'http://ionicframework.com/img/docs/spengler.jpg', name: 'Egon', mention: "We're goona go full stream."},
+    { img: 'http://ionicframework.com/img/docs/stantz.jpg', name: 'Ray', mention: "Ugly little spud, isn't he?"},
+    { img: 'http://ionicframework.com/img/docs/winston.jpg', name: 'Winston', mention: "That's a big Twinkle."},
+    { img: 'http://ionicframework.com/img/docs/tully.jpg', name: 'Tully', mention: "Okay, who brought the dog?"}
+  ];
+  return {avatars: avatars}
 });

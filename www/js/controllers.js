@@ -4,9 +4,6 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
   $scope.toggleLeftSideMenu = function() {
     $ionicSideMenuDelegate.toggleLeft();
   };
-  $scope.closeMenu = function () {
-    $ionicSideMenuDelegate.isOpen();
-  };
 })
 .controller('MapController', function($scope, $ionicLoading, $ionicActionSheet, shops) {
   var initialize = function() {
@@ -53,12 +50,9 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       return false;
     });
 
-      $scope.map = map;
-      $scope.img = img;
-      //$scope.marker = marker;
-      //$scope.infowindow = infowindow;
+    $scope.map = map;
+    $scope.img = img;
   };
-  google.maps.event.addDomListener(window, 'load', initialize);
 
   var attachMessage = function(marker, infowindow, ionicActionSheet) {
     google.maps.event.addListener(marker, "click", function() {
@@ -75,6 +69,8 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       });
     });
   };
+
+  google.maps.event.addDomListener(window, 'load', initialize());
 
   $scope.centerOnMe = function() {
     if(!$scope.map) {
@@ -107,7 +103,8 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     });
   };
 })
-.controller('AvatarsController', function ($scope) {
+.controller('AvatarsController', function ($scope, AvatarsService) {
+    $scope.avatars = AvatarsService.avatars;
 })
 .controller('AboutUsController', function ($scope) {
 })
