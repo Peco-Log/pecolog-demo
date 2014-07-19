@@ -1,7 +1,9 @@
-<div class="avatars">
-    <a class="item item-avatar" href="#">
-      <img src="http://ionicframework.com/img/docs/venkman.jpg">
-      <h2>Venkman</h2>
-      <p>Back off, man. I'm a scientist.</p>
+<ion-content>
+  <div class="avatars">
+    <a class="item item-avatar" href="#" ng-repeat="avatar in avatars">
+      <img src="{{avatar.img}}">
+      <h2>{{avatar.name}}</h2>
+      <p>{{avatar.mention}}</p>
     </a>
-</div>
+  </div>
+</ion-content> 

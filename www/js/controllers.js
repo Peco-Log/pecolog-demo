@@ -53,12 +53,9 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       return false;
     });
 
-      $scope.map = map;
-      $scope.img = img;
-      //$scope.marker = marker;
-      //$scope.infowindow = infowindow;
-  }
-  google.maps.event.addDomListener(window, 'load', initialize);
+    $scope.map = map;
+    $scope.img = img;
+  };
 
   var attachMessage = function(marker, infowindow, ionicActionSheet) {
     google.maps.event.addListener(marker, "click", function() {
@@ -74,7 +71,9 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
         }
       });
     });
-  }
+  };
+
+  google.maps.event.addDomListener(window, 'load', initialize());
 
   $scope.centerOnMe = function() {
     if(!$scope.map) {
@@ -107,7 +106,8 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     });
   };
 })
-.controller('AvatarsController', function ($scope) {
+.controller('AvatarsController', function ($scope, AvatarsService) {
+    $scope.avatars = AvatarsService.avatars;
 })
 .controller('AboutUsController', function ($scope) {
 })
