@@ -10,7 +10,7 @@ angular.module('pecologApp.services', [])
     all: function () {
       return menuItems;
     }
-  }
+  };
 })
 .factory('ShopService', function ($resource, $q) {
   var SHOP_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/shop/';
@@ -18,7 +18,7 @@ angular.module('pecologApp.services', [])
     all: function () {
       return $resource(SHOP_BASE_URL + '-', {get: {method: 'GET'}}).get();
     }
-  }
+  };
 })
 .factory('AvatarsService', function () {
   var avatars = [

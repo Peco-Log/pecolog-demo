@@ -4,15 +4,12 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
   $scope.toggleLeftSideMenu = function() {
     $ionicSideMenuDelegate.toggleLeft();
   };
-  $scope.closeMenu = function () {
-    $ionicSideMenuDelegate.isOpen();
-  };
 })
 .controller('MapController', function($scope, $ionicLoading, $ionicActionSheet, shops) {
   var initialize = function() {
 
-    var markerDataList = new Array();
-    var comments = ["うまい", "まずい"]
+    var markerDataList = [];
+    var comments = ['うまい', 'まずい'];
     _(shops._objs).each(function(shop) {
       markerDataList.push({ z: shop._coord[1],   x: shop._coord[0],   content: shop.name,  comment: comments.shift() });
     });
