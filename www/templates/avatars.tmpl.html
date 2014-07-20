@@ -1,9 +1,17 @@
 <ion-content>
-  <div class="avatars">
-    <a class="item item-avatar" href="#" ng-repeat="avatar in avatars">
+<div class="list">
+  <ul>
+    <li class="item item-avatar item-toggle" ng-repeat="avatar in avatars">
       <img src="{{avatar.img}}">
       <h2>{{avatar.name}}</h2>
-      <p>{{avatar.mention}}</p>
-    </a>
-  </div>
+      {{avatar.mention}}
+      <label class="toggle toggle-assertive">
+        <input type="checkbox" ng-model="avatar.isChecked">
+        <div class="track">
+          <div class="handle"></div>
+        </div>
+      </label>
+    </li>
+  </ul>
+</div>
 </ion-content> 

@@ -12,3 +12,6 @@
 body {
     cursor: url('http://ionicframework.com/img/finger.png'), auto;
 }
+.item-toggle .toggle {
+top: 30%;
+}

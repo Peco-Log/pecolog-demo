@@ -50,8 +50,47 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       return false;
     });
 
+    new LongPress(map, 500);
+    google.maps.event.addListener(map, 'longpress', function(e) {
+      new google.maps.Marker({
+        position: e.latLng,
+        map: map,
+        icon: img
+      });
+    });
+
     $scope.map = map;
     $scope.img = img;
+  };
+  
+  function LongPress(map, length) {
+    this.length_ = length;
+    var me = this;
+    me.map_ = map;
+    me.timeoutId_ = null;
+    google.maps.event.addListener(map, 'mousedown', function(e) {
+      me.onMouseDown_(e);
+    });
+    google.maps.event.addListener(map, 'mouseup', function(e) {
+      me.onMouseUp_(e);
+    });
+    google.maps.event.addListener(map, 'drag', function(e) {
+      me.onMapDrag_(e);
+    });
+  };
+  LongPress.prototype.onMouseUp_ = function(e) {
+    clearTimeout(this.timeoutId_);
+  };
+  LongPress.prototype.onMouseDown_ = function(e) {
+    clearTimeout(this.timeoutId_);
+    var map = this.map_;
+    var event = e;
+    this.timeoutId_ = setTimeout(function() {
+      google.maps.event.trigger(map, 'longpress', event);
+    }, this.length_);
+  };
+  LongPress.prototype.onMapDrag_ = function(e) {
+    clearTimeout(this.timeoutId_);
   };
 
   var attachMessage = function(marker, infowindow, ionicActionSheet) {
