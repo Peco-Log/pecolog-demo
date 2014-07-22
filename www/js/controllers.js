@@ -5,7 +5,7 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     $ionicSideMenuDelegate.toggleLeft();
   };
 })
-.controller('MapController', function($scope, $ionicLoading, $ionicActionSheet, shops) {
+.controller('MapController', function($scope, $ionicLoading, $ionicActionSheet, $state, shops) {
   var initialize = function() {
 
     var markerDataList = [];
@@ -52,11 +52,12 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
 
     new LongPress(map, 500);
     google.maps.event.addListener(map, 'longpress', function(e) {
-      new google.maps.Marker({
+      var marker = new google.maps.Marker({
         position: e.latLng,
         map: map,
         icon: img
       });
+      registorShop(marker);
     });
 
     $scope.map = map;
@@ -109,6 +110,27 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     });
   };
 
+  var registorShop = function(marker, ionicActionSheet, state) {
+    $ionicActionSheet.show({
+      titleText: 'ショップ登録',
+      buttons: [
+        { text: '登録する'}
+      ],
+      cancelText: 'Cancel',
+      cancel: function() {
+        marker.setMap(null);
+      },
+      destructiveButtonClicked: function() {
+        console.log('DESTRUCT');
+        return true;
+      },
+      buttonClicked: function() {
+        $state.go("register", {z:marker.position.k, x:marker.position.B});
+        return true;
+      }
+    });
+  };
+
   google.maps.event.addDomListener(window, 'load', initialize());
 
   $scope.centerOnMe = function() {
@@ -141,6 +163,10 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       alert('Unable to get location: ' + error.message);
     });
   };
+})
+.controller('RegisterController', function ($scope, $stateParams) {
+  $scope.z = $stateParams.z;
+  $scope.x = $stateParams.x;
 })
 .controller('AvatarsController', function ($scope, AvatarsService) {
     $scope.avatars = AvatarsService.avatars;

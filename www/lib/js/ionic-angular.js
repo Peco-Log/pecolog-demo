@@ -1159,6 +1159,7 @@ angular.module('ionic.ui.actionSheet', [])
                     '<div class="action-sheet-group">' +
                       '<div class="action-sheet-title" ng-if="titleText">{{titleText}}</div>' +
                       '<button class="button" ng-click="buttonClicked($index)" ng-repeat="button in buttons">{{button.text}}</button>' +
+                      '<input type="text">' +
                     '</div>' +
                     '<div class="action-sheet-group" ng-if="destructiveText">' +
                       '<button class="button destructive" ng-click="destructiveButtonClicked()">{{destructiveText}}</button>' +

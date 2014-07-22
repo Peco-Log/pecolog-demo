@@ -1,4 +1,4 @@
-var app = angular.module('pecologApp', ['ngResource','ui.router', 'pecologApp.controllers']);
+var app = angular.module('pecologApp', ['ngResource','ui.router', 'pecologApp.controllers', 'ngSanitize']);
 
 app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $urlRouterProvider) {
   $urlRouterProvider.otherwise("/map");
@@ -24,6 +24,15 @@ app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $u
       contentView: {
         templateUrl: "templates/avatars.tmpl.html",
         controller: "AvatarsController"
+      }
+    }
+  })
+  .state("register", {
+    url: "^/register/:z/:x",
+    views: {
+      contentView: {
+        templateUrl: "templates/resister.tmpl.html",
+        controller: "RegisterController"
       }
     }
   })
