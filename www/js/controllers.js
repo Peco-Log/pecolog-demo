@@ -5,7 +5,7 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     $ionicSideMenuDelegate.toggleLeft();
   };
 })
-.controller('MapController', function($scope, $ionicLoading, $ionicActionSheet, $state, shops, $ionicModal, $rootScope) {
+.controller('MapController', function($scope, $ionicLoading, $ionicActionSheet, $state, shops, MapService, $ionicModal, $rootScope) {
   var initialize = function() {
 
     var markerDataList = [];
@@ -13,34 +13,23 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     _(shops._objs).each(function(shop) {
       markerDataList.push({ z: shop._coord[1],   x: shop._coord[0],   name: shop.name,  comment: comments.shift() });
     });
-    $rootScope.markerDataList = markerDataList;
-    var latlng = new google.maps.LatLng(shops._objs[0]._coord[1], shops._objs[0]._coord[0]);
-    var mapOptions = {
-      center: latlng,
-      zoom: 16,
-      maxWidth:250,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-    var map = new google.maps.Map(document.getElementById("map"), mapOptions);
-    var img = new google.maps.MarkerImage(
-      'img/peco3.png',
-      new google.maps.Size(50.0, 60.0),
-      new google.maps.Point(0, 0),
-      new google.maps.Point(25.0, 60.0)
-    );
+    /* map中心の緯度・経度 */
+    var latLng = new google.maps.LatLng(shops._objs[0]._coord[1], shops._objs[0]._coord[0]);
+    var map = MapService.map;
+    map.setCenter(latLng);
+    /* マーカーのイメージ */
+    var img = MapService.img;
 
     _(markerDataList).each(function(markerData) {
-      var marker = new google.maps.Marker({
-        //position: data[i].position, /* マーカーを立てる場所の緯度・経度 */
-        position: new google.maps.LatLng(markerData.z, markerData.x),
-        map: map, /*マーカーを配置する地図オブジェクト */
-        icon: img
-      });
-      var infowindow = new google.maps.InfoWindow({
-        content: markerData.name + ":" + markerData.comment,
-        position: new google.maps.LatLng(markerData.z, markerData.x),
-        disableAutoPan: true
-      });
+      var localLatLng = new google.maps.LatLng(markerData.z, markerData.x);
+      /* 各マーカーの立てる場所の緯度・経度 */
+      var marker = MapService.marker();
+      marker.setPosition(localLatLng);
+      marker.setMap(map);
+      /* ショップへのコメント */
+      var infowindow = MapService.infowindow();
+      infowindow.setContent(markerData.name + ":" + markerData.comment);
+      infowindow.setPosition(localLatLng);
       $rootScope.$on('attachMessage',attachMessage(marker, infowindow));
     });
 
@@ -52,17 +41,14 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
 
     new LongPress(map, 500);
     google.maps.event.addListener(map, 'longpress', function(e) {
-      var marker = new google.maps.Marker({
-        position: e.latLng,
-        map: map,
-        icon: img
-      });
-      //registorShop(marker);
-      $scope.modal.show();
+      var marker = MapService.marker();
+      marker.setPosition(e.latLng);
+      marker.setMap(map);
       $rootScope.marker = marker;
+      $scope.modal.show();
     });
 
-    showModal();
+    setModalFunction();
     $scope.map = map;
     $scope.img = img;
   };
@@ -82,9 +68,11 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       me.onMapDrag_(e);
     });
   };
+
   LongPress.prototype.onMouseUp_ = function(e) {
     clearTimeout(this.timeoutId_);
   };
+
   LongPress.prototype.onMouseDown_ = function(e) {
     clearTimeout(this.timeoutId_);
     var map = this.map_;
@@ -93,11 +81,12 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       google.maps.event.trigger(map, 'longpress', event);
     }, this.length_);
   };
+
   LongPress.prototype.onMapDrag_ = function(e) {
     clearTimeout(this.timeoutId_);
   };
 
-  var attachMessage = function(marker, infowindow, ionicActionSheet) {
+  var attachMessage = function(marker, infowindow) {
     google.maps.event.addListener(marker, "click", function() {
       var contents = infowindow.getContent().split(":");
       $ionicActionSheet.show({
@@ -113,28 +102,7 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     });
   };
 
-  var registorShop = function(marker, ionicActionSheet, state) {
-    $ionicActionSheet.show({
-      titleText: 'ショップ登録',
-      buttons: [
-        { text: '登録する'}
-      ],
-      cancelText: 'Cancel',
-      cancel: function() {
-        marker.setMap(null);
-      },
-      destructiveButtonClicked: function() {
-        console.log('DESTRUCT');
-        return true;
-      },
-      buttonClicked: function() {
-        $state.go("register", {z:marker.position.k, x:marker.position.B});
-        return true;
-      }
-    });
-  };
-
-  var showModal = function(ionicModal) {
+  var setModalFunction = function() {
       $ionicModal.fromTemplateUrl('templates/modal.tmpl.html', function(modal) {
         $scope.modal = modal;
       }, {
@@ -156,20 +124,12 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     });
 
     navigator.geolocation.getCurrentPosition(function(pos) {
-      var latlng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-      var marker = new google.maps.Marker({
-        position: latlng, /* マーカーを立てる場所の緯度・経度 */ 
-        map: $scope.map, /*マーカーを配置する地図オブジェクト */
-        icon: $scope.img
-      });
-      var infowindow = new google.maps.InfoWindow({
-        content: "I'm here:Hi!",
-        position: latlng,
-        disableAutoPan: true
-      });
-      attachMessage(marker, infowindow);
+      var latLng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+      var myPositionMarker = MapService.myPositionMarker();
+      myPositionMarker.setPosition(latLng);
+      myPositionMarker.setMap($scope.map);
       google.maps.event.addDomListener(window, 'load', initialize);
-      $scope.map.setCenter(latlng);
+      $scope.map.setCenter(latLng);
       $scope.loading.hide();
     }, function(error) {
       alert('Unable to get location: ' + error.message);
@@ -199,7 +159,7 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     $scope.modal.hide();
     $rootScope.marker.setMap(null);
   };
-  var attachMessage = function(marker, infowindow, ionicActionSheet) {
+  var attachMessage = function(marker, infowindow) {
     google.maps.event.addListener(marker, "click", function() {
       var contents = infowindow.getContent().split(":");
       $ionicActionSheet.show({

@@ -12,7 +12,7 @@ angular.module('pecologApp.services', [])
     }
   };
 })
-.factory('ShopService', function ($resource, $q) {
+.factory('ShopService', function ($resource) {
   var SHOP_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/shop/';
   return {
     all: function () {
@@ -20,6 +20,64 @@ angular.module('pecologApp.services', [])
     }
   };
 })
+.factory('MapService', function () {
+  var mapOptions = {
+    zoom: 16,
+    maxWidth:250,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
+  var img = new google.maps.MarkerImage(
+    'img/peco3.png',
+    new google.maps.Size(50.0, 60.0),
+    new google.maps.Point(0, 0),
+    new google.maps.Point(25.0, 60.0)
+  );
+  var myPositionImg = new google.maps.MarkerImage(
+    'img/ionic.png',
+    new google.maps.Size(100.0, 100.0),
+    new google.maps.Point(0, 0),
+    new google.maps.Point(50.0, 100.0),
+    new google.maps.Size(50, 50)
+  );
+  var map = new google.maps.Map(document.getElementById("map"), mapOptions); 
+  return {
+    map: map,
+    marker: function() {
+      return new google.maps.Marker({
+        icon: img
+      });
+    },
+    infowindow: function() {
+      return new google.maps.InfoWindow({
+        disableAutoPan: true
+      });
+    },
+    myPositionMarker: function() {
+      return new google.maps.Marker({
+        icon: myPositionImg
+      });
+    },
+  };
+})
+.factory('MapCtlrService', function () {
+  return {
+    longPress: function (map, length) {
+      this.length_ = length;
+      var me = this;
+      me.map_ = map;
+      me.timeoutId_ = null;
+      google.maps.event.addListener(map, 'mousedown', function(e) {
+        me.onMouseDown_(e);
+      });
+      google.maps.event.addListener(map, 'mouseup', function(e) {
+        me.onMouseUp_(e);
+      });
+      google.maps.event.addListener(map, 'drag', function(e) {
+        me.onMapDrag_(e);
+      });
+    }
+  };
+})  
 .factory('AvatarsService', function () {
   var avatars = [
     { img: 'http://ionicframework.com/img/docs/venkman.jpg', name: 'Venkman', mention: "Back off, man. I'm a scientist.", isChecked: true},
@@ -28,5 +86,5 @@ angular.module('pecologApp.services', [])
     { img: 'http://ionicframework.com/img/docs/winston.jpg', name: 'Winston', mention: "That's a big Twinkle.", isChecked: true},
     { img: 'http://ionicframework.com/img/docs/tully.jpg', name: 'Tully', mention: "Okay, who brought the dog?", isChecked: true}
   ];
-  return {avatars: avatars}
+  return {avatars: avatars};
 });

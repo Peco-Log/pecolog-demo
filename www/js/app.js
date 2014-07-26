@@ -27,15 +27,6 @@ app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $u
       }
     }
   })
-  .state("register", {
-    url: "^/register/:z/:x",
-    views: {
-      contentView: {
-        templateUrl: "templates/resister.tmpl.html",
-        controller: "RegisterController"
-      }
-    }
-  })
   .state("aboutUs", {
     url: "^/aboutUs",
     views: {
