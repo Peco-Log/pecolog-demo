@@ -15,10 +15,8 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     });
     /* map中心の緯度・経度 */
     var latLng = new google.maps.LatLng(shops._objs[0]._coord[1], shops._objs[0]._coord[0]);
-    var map = MapService.map;
+    var map = MapService.map();
     map.setCenter(latLng);
-    /* マーカーのイメージ */
-    var img = MapService.img;
 
     _(markerDataList).each(function(markerData) {
       var localLatLng = new google.maps.LatLng(markerData.z, markerData.x);
@@ -50,7 +48,6 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
 
     setModalFunction();
     $scope.map = map;
-    $scope.img = img;
   };
   
   function LongPress(map, length) {

@@ -39,9 +39,10 @@ angular.module('pecologApp.services', [])
     new google.maps.Point(50.0, 100.0),
     new google.maps.Size(50, 50)
   );
-  var map = new google.maps.Map(document.getElementById("map"), mapOptions); 
   return {
-    map: map,
+    map: function() {
+      return new google.maps.Map(document.getElementById("map"), mapOptions);
+    },
     marker: function() {
       return new google.maps.Marker({
         icon: img
