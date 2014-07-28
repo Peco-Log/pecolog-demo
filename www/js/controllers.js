@@ -28,7 +28,7 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       var infowindow = MapService.infowindow();
       infowindow.setContent(markerData.name + ":" + markerData.comment);
       infowindow.setPosition(localLatLng);
-      $rootScope.$on('attachMessage',attachMessage(marker, infowindow));
+      attachMessage(marker, infowindow);
     });
 
     // Stop the side bar from dragging when mousedown/tapdown on the map
@@ -37,8 +37,7 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       return false;
     });
 
-    new LongPress(map, 500);
-    google.maps.event.addListener(map, 'longpress', function(e) {
+    google.maps.event.addListener(map, 'click', function(e) {
       var marker = MapService.marker();
       marker.setPosition(e.latLng);
       marker.setMap(map);
@@ -48,39 +47,6 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
 
     setModalFunction();
     $scope.map = map;
-  };
-  
-  function LongPress(map, length) {
-    this.length_ = length;
-    var me = this;
-    me.map_ = map;
-    me.timeoutId_ = null;
-    google.maps.event.addListener(map, 'mousedown', function(e) {
-      me.onMouseDown_(e);
-    });
-    google.maps.event.addListener(map, 'mouseup', function(e) {
-      me.onMouseUp_(e);
-    });
-    google.maps.event.addListener(map, 'drag', function(e) {
-      me.onMapDrag_(e);
-    });
-  };
-
-  LongPress.prototype.onMouseUp_ = function(e) {
-    clearTimeout(this.timeoutId_);
-  };
-
-  LongPress.prototype.onMouseDown_ = function(e) {
-    clearTimeout(this.timeoutId_);
-    var map = this.map_;
-    var event = e;
-    this.timeoutId_ = setTimeout(function() {
-      google.maps.event.trigger(map, 'longpress', event);
-    }, this.length_);
-  };
-
-  LongPress.prototype.onMapDrag_ = function(e) {
-    clearTimeout(this.timeoutId_);
   };
 
   var attachMessage = function(marker, infowindow) {
@@ -142,15 +108,14 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
   $scope.createShop = function() {
     var z = $rootScope.marker.position.k;
     var x = $rootScope.marker.position.B;
-    console.log('Create Content', $scope.newShop);
     var infowindow = new google.maps.InfoWindow({
       content: $scope.newShop.name + ":" + $scope.newShop.comment,
       position: new google.maps.LatLng(z, x),
       disableAutoPan: true
     });
-    //$rootScope.$emit('attachMessage', $rootScope.marker, infowindow);
     attachMessage($rootScope.marker, infowindow); 
     $scope.modal.hide();
+    $scope.newShop = null;
   };
   $scope.cancel = function() {
     $scope.modal.hide();
