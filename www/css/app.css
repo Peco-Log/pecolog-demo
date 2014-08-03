@@ -15,3 +15,41 @@ body {
 .item-toggle .toggle {
 top: 30%;
 }
+
+.messageModal {
+  top: 50%;
+  right: 1%;
+  left: 1%;
+  min-height: 50%;
+  width: 98%;
+}
+
+.shopBar {
+  height: 40px;
+}
+
+.shopBar .title {
+  line-height: 40px;
+}
+
+.msg {
+ padding-left: 60px;
+}
+
+.item-thumbnail-left>img:first-child {
+  height: 40px;
+  width: 40px;
+}
+
+.has-footer {
+ bottom: 20px;
+}
+
+.card {
+  margin-top: 1px;
+  margin-left: 0px;
+  margin-bottom: 0px;
+  margin-right: 0px;
+}
+
+
