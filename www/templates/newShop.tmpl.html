@@ -1,10 +1,9 @@
-<div class="modal" ng-controller="ModalCtrl">
+<div class="modal" ng-controller="NewShopModalController">
   <ion-header-bar class="bar bar-header bar-positive">
   <h1 class="title">New Shop</h1>
   <button class="button button-clear button-primary" ng-click="cancel()">Cancel</button>
   </ion-header-bar>
   <ion-content>
-  <div class="padding">
     <div class="list">
       <label class="item item-input">
         <input type="text" ng-model="newShop.name" placeholder="Shop Name">
@@ -14,6 +13,5 @@
       </label>
       <button class="button button-block button-positive" ng-click="createShop()">Create Shop</button>
     </div>
-  </div>
   </ion-content>
 </div>

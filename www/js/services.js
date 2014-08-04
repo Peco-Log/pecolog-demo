@@ -45,40 +45,52 @@ angular.module('pecologApp.services', [])
     },
     marker: function() {
       return new google.maps.Marker({
-        icon: img
+        icon: img,
+        draggable: true,
+        //raiseOnDrag: false,
       });
-    },
-    infowindow: function() {
-      return new google.maps.InfoWindow({
-        disableAutoPan: true
-      });
-    },
-    myPositionMarker: function() {
-      return new google.maps.Marker({
-        icon: myPositionImg
-      });
-    },
-  };
-})
-.factory('MapCtlrService', function () {
-  return {
-    longPress: function (map, length) {
-      this.length_ = length;
-      var me = this;
-      me.map_ = map;
-      me.timeoutId_ = null;
-      google.maps.event.addListener(map, 'mousedown', function(e) {
-        me.onMouseDown_(e);
-      });
-      google.maps.event.addListener(map, 'mouseup', function(e) {
-        me.onMouseUp_(e);
-      });
-      google.maps.event.addListener(map, 'drag', function(e) {
-        me.onMapDrag_(e);
-      });
-    }
-  };
-})  
+      },
+      infowindow: function() {
+        return new google.maps.InfoWindow({
+          disableAutoPan: true
+        });
+      },
+      myPositionMarker: function() {
+        return new google.maps.Marker({
+          icon: myPositionImg
+        });
+      },
+    };
+  })
+  .factory('ModalService', function ($ionicModal, $ionicActionSheet) {
+    return {
+      attachMessage: function($scope, marker, infowindow, url) {
+        $ionicModal.fromTemplateUrl(url, function(modal) {
+          $scope.messageModal = modal;
+        }, {
+          scope: $scope,
+          animation: 'slide-in-up',
+          foucusFirstInput: true
+        });
+        google.maps.event.addListener(marker, "click", function() {
+          var contents = infowindow.getContent().split(":");
+          $scope.title = contents[0];
+          $scope.message = contents[1];
+          $scope.img = 'http://ionicframework.com/img/docs/venkman.jpg';
+          $scope.name = 'Venkman';
+          $scope.messageModal.show();
+        });
+      },
+      setModalFunction: function($scope, url) {
+        $ionicModal.fromTemplateUrl(url, function(modal) {
+          $scope.newShopModal = modal;
+        }, {
+          animation: 'slide-in-up',
+          foucusFirstInput: true
+        });
+      }
+    };
+  })  
 .factory('AvatarsService', function () {
   var avatars = [
     { img: 'http://ionicframework.com/img/docs/venkman.jpg', name: 'Venkman', mention: "Back off, man. I'm a scientist.", isChecked: true},

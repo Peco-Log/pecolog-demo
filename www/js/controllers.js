@@ -5,7 +5,7 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     $ionicSideMenuDelegate.toggleLeft();
   };
 })
-.controller('MapController', function($scope, $ionicLoading, $ionicActionSheet, $state, shops, MapService, $ionicModal, $rootScope) {
+.controller('MapController', function($scope, $ionicLoading, $ionicActionSheet, $state, shops, MapService, ModalService, $ionicModal, $rootScope) {
   var initialize = function() {
 
     var markerDataList = [];
@@ -28,7 +28,7 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       var infowindow = MapService.infowindow();
       infowindow.setContent(markerData.name + ":" + markerData.comment);
       infowindow.setPosition(localLatLng);
-      attachMessage(marker, infowindow);
+      ModalService.attachMessage($scope, marker, infowindow, 'templates/message.tmpl.html');
     });
 
     // Stop the side bar from dragging when mousedown/tapdown on the map
@@ -42,38 +42,13 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       marker.setPosition(e.latLng);
       marker.setMap(map);
       $rootScope.marker = marker;
-      $scope.modal.show();
+      $scope.newShopModal.show();
     });
 
-    setModalFunction();
+    ModalService.setModalFunction($scope, 'templates/newShop.tmpl.html');
     $scope.map = map;
   };
 
-  var attachMessage = function(marker, infowindow) {
-    google.maps.event.addListener(marker, "click", function() {
-      var contents = infowindow.getContent().split(":");
-      $ionicActionSheet.show({
-        titleText: contents[0],
-        buttons: [
-          { text: contents[1]},
-        ],
-        destructiveButtonClicked: function() {
-          console.log('DESTRUCT');
-          return true;
-        }
-      });
-    });
-  };
-
-  var setModalFunction = function() {
-      $ionicModal.fromTemplateUrl('templates/modal.tmpl.html', function(modal) {
-        $scope.modal = modal;
-      }, {
-        animation: 'slide-in-up',
-        foucusFirstInput: true
-      });
-  }
-  
   google.maps.event.addDomListener(window, 'load', initialize());
 
   $scope.centerOnMe = function() {
@@ -99,11 +74,12 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     });
   };
 })
-.controller('RegisterController', function ($scope, $stateParams) {
-  $scope.z = $stateParams.z;
-  $scope.x = $stateParams.x;
+.controller('MessageModalController', function ($scope) {
+  $scope.cancel = function() {
+    $scope.messageModal.hide();
+  };
 })
-.controller('ModalCtrl', function($scope, $rootScope, $ionicActionSheet) {
+.controller('NewShopModalController', function($scope, $rootScope, $ionicActionSheet, ModalService) {
   $scope.newShop = {}; 
   $scope.createShop = function() {
     var z = $rootScope.marker.position.k;
@@ -113,28 +89,14 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       position: new google.maps.LatLng(z, x),
       disableAutoPan: true
     });
-    attachMessage($rootScope.marker, infowindow); 
+    ModalService.attachMessage($scope, $rootScope.marker, infowindow, 'templates/message.tmpl.html'); 
     $scope.modal.hide();
-    $scope.newShop = null;
+    $scope.newShop = {};
   };
   $scope.cancel = function() {
     $scope.modal.hide();
+    $scope.newShop = {};
     $rootScope.marker.setMap(null);
-  };
-  var attachMessage = function(marker, infowindow) {
-    google.maps.event.addListener(marker, "click", function() {
-      var contents = infowindow.getContent().split(":");
-      $ionicActionSheet.show({
-        titleText: contents[0],
-        buttons: [
-          { text: contents[1]},
-        ],
-        destructiveButtonClicked: function() {
-          console.log('DESTRUCT');
-          return true;
-        }
-      });
-    });
   };
 })
 .controller('AvatarsController', function ($scope, AvatarsService) {
