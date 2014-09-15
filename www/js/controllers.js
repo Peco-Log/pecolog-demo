@@ -11,10 +11,10 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     var markerDataList = [];
     var comments = ['うまい', 'まずい'];
     _(shops._objs).each(function(shop) {
-      markerDataList.push({ z: shop._coord[1],   x: shop._coord[0],   name: shop.name,  comment: comments.shift() });
+      markerDataList.push({ z: shop.latitude,   x: shop.longitude,   name: shop.name,  comment: comments.shift() });
     });
     /* map中心の緯度・経度 */
-    var latLng = new google.maps.LatLng(shops._objs[0]._coord[1], shops._objs[0]._coord[0]);
+    var latLng = new google.maps.LatLng(shops._objs[2].latitude, shops._objs[2].longitude);
     var map = MapService.map();
     map.setCenter(latLng);
 
@@ -79,11 +79,25 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     $scope.messageModal.hide();
   };
 })
-.controller('NewShopModalController', function($scope, $rootScope, $ionicActionSheet, ModalService) {
+.controller('NewShopModalController', function($scope, $http, $rootScope, $ionicActionSheet, ModalService) {
   $scope.newShop = {}; 
+  var SHOP_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/shop';
   $scope.createShop = function() {
     var z = $rootScope.marker.position.k;
     var x = $rootScope.marker.position.B;
+    $http({
+      method: 'POST',
+      url: SHOP_BASE_URL,
+      headers: {
+        'X-APPIARIES-TOKEN': 'app5aeb8f6e4ddf1b9e892f855672',
+        'Content-Type': 'application/json'},
+      data: {
+        name: $scope.newShop.name,
+        latitude: z,
+        longitude: x
+      }
+    });
+
     var infowindow = new google.maps.InfoWindow({
       content: $scope.newShop.name + ":" + $scope.newShop.comment,
       position: new google.maps.LatLng(z, x),

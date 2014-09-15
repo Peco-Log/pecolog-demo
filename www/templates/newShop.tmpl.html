@@ -11,7 +11,7 @@
       <label class="item item-input">
         <input type="text" ng-model="newShop.comment" placeholder="Comment">
       </label>
-      <button class="button button-block button-positive" ng-click="createShop()">Create Shop</button>
+      <button class="button button-block button-positive" ng-show="newShop.comment && newShop.name" ng-click="createShop()">Create Shop</button>
     </div>
   </ion-content>
 </div>
