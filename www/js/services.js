@@ -20,6 +20,14 @@ angular.module('pecologApp.services', [])
     }
   };
 })
+.factory('CommentService', function ($resource) {
+  var COMMENT_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/comment/';
+  return {
+    all: function () {
+      return $resource(COMMENT_BASE_URL + '-', {get: {method: 'GET'}}).get();
+    }
+  };
+})
 .factory('MapService', function () {
   var mapOptions = {
     zoom: 16,

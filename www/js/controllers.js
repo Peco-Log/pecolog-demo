@@ -82,24 +82,41 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
 .controller('NewShopModalController', function($scope, $http, $rootScope, $ionicActionSheet, ModalService) {
   $scope.newShop = {}; 
   var SHOP_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/shop';
+  var COMMENT_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/comment';
+  var TOKEN = 'app5aeb8f6e4ddf1b9e892f855672'; 
+  var CONTENT_TYPE = 'application/json';
   $scope.createShop = function() {
     var z = $rootScope.marker.position.k;
     var x = $rootScope.marker.position.B;
+    var name = $scope.newShop.name;
+    var comment = $scope.newShop.comment;
+    var deferred = $q.defer();
     $http({
       method: 'POST',
-      url: SHOP_BASE_URL,
+      url: SHOP_BASE_URL + '?get=true',
       headers: {
-        'X-APPIARIES-TOKEN': 'app5aeb8f6e4ddf1b9e892f855672',
-        'Content-Type': 'application/json'},
+        'X-APPIARIES-TOKEN': TOKEN,
+        'Content-Type': CONTENT_TYPE},
       data: {
-        name: $scope.newShop.name,
+        name: name,
         latitude: z,
         longitude: x
-      }
-    });
+      }}).success(function(data, status, headers, config) {
+        $http({
+          method: 'POST',
+          url: COMMENT_BASE_URL,
+          headers: {
+            'X-APPIARIES-TOKEN': TOKEN,
+            'Content-Type': CONTENT_TYPE},
+          data: {
+            shop_id: data._id,
+            comment: comment
+          }
+        });
+      });
 
     var infowindow = new google.maps.InfoWindow({
-      content: $scope.newShop.name + ":" + $scope.newShop.comment,
+      content: name + ":" + comment,
       position: new google.maps.LatLng(z, x),
       disableAutoPan: true
     });
