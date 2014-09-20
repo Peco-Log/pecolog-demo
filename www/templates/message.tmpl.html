@@ -4,30 +4,29 @@
   <button class="button button-clear button-primary" ng-click="cancel()">Cancel</button>
   </ion-header-bar>
   <ion-content>
-  <div class="msg item item-thumbnail-left">
-    <img src="{{img}}"><h3>{{name}}</h3>
-    <div class="card">
-      <div class="item item-text-wrap">
-        {{message}}
+    <div class="msg item item-thumbnail-left" ng-show="newComment">
+      <img src="{{img}}"><h3>{{name}}</h3>
+      <div class="card">
+        <div class="item item-text-wrap">
+          {{newComment}}
+        </div>
       </div>
     </div>
-  </div>
-  <div class="msg item item-thumbnail-left">
-    <img src="{{img}}"><h3>{{name}}</h3>
-    <div class="card">
-      <div class="item item-text-wrap">
-        This is a basic Card which contains an item that has wrapping text.a
-        This is a basic Card which contains an item that has wrapping text.a
-        aaa
-        This is a basic Card which contains an item that has wrapping text.a
-        This is a basic Card which contains an item that has wrapping text.a
-        This is a basic Card which contains an item that has wrapping text.a
-        This is a basic Card which contains an item that has wrapping text.a
-        This is a basic Card which contains an item that has wrapping text.a
-        This is a basic Card which contains an item that has wrapping text.a
-        This is a basic Card which contains an item that has wrapping text.a
+    <div class="msg item item-thumbnail-left" ng-hide="newComment" ng-repeat="comment in comments._objs | filter: {shop_id: id} | filter: {user_id: user_id}">
+      <img src="{{commentpicture_id}}"><h3>{{comment.user_id}}</h3>
+      <div class="card">
+        <div class="item item-text-wrap">
+          {{comment.comment}}
+        </div>
       </div>
     </div>
-  </div>
+    <div class="msg item item-thumbnail-left" ng-repeat="comment in comments._objs | filter: {shop_id: id} | filter: {user_id: '!' + user_id}">
+      <img src="{{commentpicture_id}}"><h3>{{comment.user_id}}</h3>
+      <div class="card">
+        <div class="item item-text-wrap">
+          {{comment.comment}}
+        </div>
+      </div>
+    </div>
   </ion-content>
 </div>

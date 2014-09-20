@@ -1,5 +1,7 @@
-angular.module('pecologApp.services', [])
+var COMMENT_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/comment/';
+var SHOP_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/shop/';
 
+angular.module('pecologApp.services', [])
 .factory('MenuService', function () {
   var menuItems = [
     { text: 'Map', iconClass: 'icon ion-map', colour: "candy-purple-bg", link: 'map()'},
@@ -13,7 +15,6 @@ angular.module('pecologApp.services', [])
   };
 })
 .factory('ShopService', function ($resource) {
-  var SHOP_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/shop/';
   return {
     all: function () {
       return $resource(SHOP_BASE_URL + '-', {get: {method: 'GET'}}).get();
@@ -21,7 +22,6 @@ angular.module('pecologApp.services', [])
   };
 })
 .factory('CommentService', function ($resource) {
-  var COMMENT_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/comment/';
   return {
     all: function () {
       return $resource(COMMENT_BASE_URL + '-', {get: {method: 'GET'}}).get();
@@ -57,48 +57,89 @@ angular.module('pecologApp.services', [])
         draggable: true,
         //raiseOnDrag: false,
       });
-      },
-      infowindow: function() {
-        return new google.maps.InfoWindow({
-          disableAutoPan: true
-        });
-      },
-      myPositionMarker: function() {
-        return new google.maps.Marker({
-          icon: myPositionImg
-        });
-      },
-    };
-  })
-  .factory('ModalService', function ($ionicModal, $ionicActionSheet) {
-    return {
-      attachMessage: function($scope, marker, infowindow, url) {
-        $ionicModal.fromTemplateUrl(url, function(modal) {
-          $scope.messageModal = modal;
-        }, {
-          scope: $scope,
-          animation: 'slide-in-up',
-          foucusFirstInput: true
-        });
-        google.maps.event.addListener(marker, "click", function() {
-          var contents = infowindow.getContent().split(":");
-          $scope.title = contents[0];
-          $scope.message = contents[1];
-          $scope.img = 'http://ionicframework.com/img/docs/venkman.jpg';
-          $scope.name = 'Venkman';
-          $scope.messageModal.show();
-        });
-      },
-      setModalFunction: function($scope, url) {
-        $ionicModal.fromTemplateUrl(url, function(modal) {
-          $scope.newShopModal = modal;
-        }, {
-          animation: 'slide-in-up',
-          foucusFirstInput: true
-        });
-      }
-    };
-  })  
+    },
+    infowindow: function() {
+      return new google.maps.InfoWindow({
+        disableAutoPan: true
+      });
+    },
+    myPositionMarker: function() {
+      return new google.maps.Marker({
+        icon: myPositionImg
+      });
+    },
+  };
+})
+.factory('ModalService', function ($ionicModal, $ionicActionSheet, CommentService) {
+  return {
+    attachMessage: function($scope, marker, infowindow, url, newComment, shop_id, user_id) {
+      $ionicModal.fromTemplateUrl(url, function(modal) {
+        $scope.messageModal = modal;
+      }, {
+        scope: $scope,
+        animation: 'slide-in-up',
+        foucusFirstInput: true
+      });
+      google.maps.event.addListener(marker, "click", function() {
+        $scope.title = infowindow.getContent();
+        $scope.newComment = newComment;
+        $scope.img = 'http://ionicframework.com/img/docs/venkman.jpg';
+        $scope.name = 'Venkman';
+        $scope.comments = CommentService.all();
+        $scope.messageModal.show();
+        $scope.id = shop_id;
+        $scope.user_id = user_id;
+      });
+    },
+    setModalFunction: function($scope, url) {
+      $ionicModal.fromTemplateUrl(url, function(modal) {
+        $scope.newShopModal = modal;
+      }, {
+        animation: 'slide-in-up',
+        foucusFirstInput: true
+      });
+    }
+  };
+})  
+.factory('CreateShopService', function ($q, $http) {
+  var TOKEN = 'app5aeb8f6e4ddf1b9e892f855672'; 
+  var CONTENT_TYPE = 'application/json';
+  var deferred = $q.defer();
+  return {
+    save: function(x, z, name, comment) {
+      $http({
+        method: 'POST',
+        url: SHOP_BASE_URL + '?get=true',
+        headers: {
+          'X-APPIARIES-TOKEN': TOKEN,
+          'Content-Type': CONTENT_TYPE},
+        data: {
+          name: name,
+          latitude: z,
+          longitude: x
+      }}).success(function(data, status, headers, config) {
+        deferred.resolve(data);
+      });
+      deferred.promise.then(function(data) {
+        $http({
+          method: 'POST',
+          url: COMMENT_BASE_URL + '?get=true',
+          headers: {
+            'X-APPIARIES-TOKEN': TOKEN,
+            'Content-Type': CONTENT_TYPE},
+          data: {
+            shop_id: data._id,
+            comment: comment,
+            user_id: 'ugagod'
+          }
+        }).success(function(data, status, headers, config) {
+          deferred.resolve(data);
+        }); 
+      });
+      return deferred.promise;
+    }
+  }
+})  
 .factory('AvatarsService', function () {
   var avatars = [
     { img: 'http://ionicframework.com/img/docs/venkman.jpg', name: 'Venkman', mention: "Back off, man. I'm a scientist.", isChecked: true},

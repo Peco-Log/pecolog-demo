@@ -15,10 +15,6 @@ app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $u
       ShopService: 'ShopService',
       shops: function (ShopService) {
         return ShopService.all().$promise;
-      },
-      CommentService: 'CommentService',
-      cos: function (CommentService) {
-        return CommentService.all().$promise;
       }
     }
   })

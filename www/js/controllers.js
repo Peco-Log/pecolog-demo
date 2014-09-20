@@ -7,11 +7,9 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
 })
 .controller('MapController', function($scope, $ionicLoading, $ionicActionSheet, $state, shops, MapService, ModalService, $ionicModal, $rootScope) {
   var initialize = function() {
-
     var markerDataList = [];
-    var comments = ['うまい', 'まずい'];
     _(shops._objs).each(function(shop) {
-      markerDataList.push({ z: shop.latitude,   x: shop.longitude,   name: shop.name,  comment: comments.shift() });
+      markerDataList.push({ z: shop.latitude, x: shop.longitude, id: shop._id, name: shop.name});
     });
     /* map中心の緯度・経度 */
     var latLng = new google.maps.LatLng(shops._objs[2].latitude, shops._objs[2].longitude);
@@ -26,9 +24,10 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       marker.setMap(map);
       /* ショップへのコメント */
       var infowindow = MapService.infowindow();
-      infowindow.setContent(markerData.name + ":" + markerData.comment);
+      infowindow.setContent(markerData.name);
       infowindow.setPosition(localLatLng);
-      ModalService.attachMessage($scope, marker, infowindow, 'templates/message.tmpl.html');
+      ModalService.attachMessage($scope, marker, infowindow,
+        'templates/message.tmpl.html', null, markerData.id, 'ugagod');
     });
 
     // Stop the side bar from dragging when mousedown/tapdown on the map
@@ -79,48 +78,25 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     $scope.messageModal.hide();
   };
 })
-.controller('NewShopModalController', function($scope, $http, $rootScope, $ionicActionSheet, ModalService) {
+.controller('NewShopModalController', function($scope, $rootScope, MapService, CreateShopService,  $ionicActionSheet, ModalService) {
   $scope.newShop = {}; 
-  var SHOP_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/shop';
-  var COMMENT_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/comment';
-  var TOKEN = 'app5aeb8f6e4ddf1b9e892f855672'; 
-  var CONTENT_TYPE = 'application/json';
   $scope.createShop = function() {
     var z = $rootScope.marker.position.k;
     var x = $rootScope.marker.position.B;
     var name = $scope.newShop.name;
-    var comment = $scope.newShop.comment;
-    var deferred = $q.defer();
-    $http({
-      method: 'POST',
-      url: SHOP_BASE_URL + '?get=true',
-      headers: {
-        'X-APPIARIES-TOKEN': TOKEN,
-        'Content-Type': CONTENT_TYPE},
-      data: {
-        name: name,
-        latitude: z,
-        longitude: x
-      }}).success(function(data, status, headers, config) {
-        $http({
-          method: 'POST',
-          url: COMMENT_BASE_URL,
-          headers: {
-            'X-APPIARIES-TOKEN': TOKEN,
-            'Content-Type': CONTENT_TYPE},
-          data: {
-            shop_id: data._id,
-            comment: comment
-          }
-        });
-      });
+    var newComment = $scope.newShop.comment;
+    var deferred = CreateShopService.save(x, z, name, newComment);
+    var localLatLng = new google.maps.LatLng(z, x);
 
-    var infowindow = new google.maps.InfoWindow({
-      content: name + ":" + comment,
-      position: new google.maps.LatLng(z, x),
-      disableAutoPan: true
+    var infowindow = MapService.infowindow();
+    infowindow.setContent(name);
+    infowindow.setPosition(localLatLng);
+
+    deferred.then(function(data) {
+      ModalService.attachMessage($scope, $rootScope.marker,
+        infowindow, 'templates/message.tmpl.html', newComment, data._id, data.user_id);
     });
-    ModalService.attachMessage($scope, $rootScope.marker, infowindow, 'templates/message.tmpl.html'); 
+
     $scope.modal.hide();
     $scope.newShop = {};
   };
