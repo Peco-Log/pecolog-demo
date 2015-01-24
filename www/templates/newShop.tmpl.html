@@ -1,17 +1,20 @@
-<div class="modal" ng-controller="NewShopModalController">
-  <ion-header-bar class="bar bar-header bar-positive">
-  <h1 class="title">New Shop</h1>
-  <button class="button button-clear button-primary" ng-click="cancel()">Cancel</button>
+<div class="modal comment-modal" ng-controller="NewShopModalController">
+  <ion-header-bar class="comment-header bar bar-header bar-positive">
+  <h1>New Shop</h1>
+  <a class="tab-item cancel-icon"><i class="ion-close-circled" ng-click="cancel()"></i></a>
   </ion-header-bar>
   <ion-content>
-    <div class="list">
-      <label class="item item-input">
-        <input type="text" ng-model="newShop.name" placeholder="Shop Name">
-      </label>
-      <label class="item item-input">
-        <input type="text" ng-model="newShop.comment" placeholder="Comment">
-      </label>
-      <button class="button button-block button-positive" ng-show="newShop.comment && newShop.name" ng-click="createShop()">Create Shop</button>
-    </div>
+      <div class="comment-avatar">
+        <img src="{{userImg}}"><h3>{{userName}}</h3>
+      </div>
+      <div class="list">
+        <label class="item item-input">
+          <input type="text" ng-model="newShop.name" placeholder="Shop Name">
+        </label>
+        <label class="item item-input">
+          <input type="text" ng-model="newShop.comment" placeholder="Comment" ng-model="">
+        </label>
+        <button class="button button-block button-positive" ng-show="newShop.comment && newShop.name" ng-click="createShop()">Create Shop</button>
+      </div>
   </ion-content>
 </div>

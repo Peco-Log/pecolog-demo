@@ -1,29 +1,59 @@
-<div class="modal messageModal" ng-controller="MessageModalController">
-  <ion-header-bar class="bar bar-header bar-positive shopBar">
-  <h1 class="title">{{title}}</h1>
-  <button class="button button-clear button-primary" ng-click="cancel()">Cancel</button>
+<div class="modal comment-modal" ng-controller="MessageModalController">
+  <ion-header-bar class="comment-header">
+  <h1>{{title}}</h1>
+  <a class="tab-item cancel-icon"><i class="ion-close-circled" ng-click="cancel()"></i></a>
   </ion-header-bar>
-  <ion-content>
-    <div class="msg item item-thumbnail-left" ng-show="newComment">
-      <img src="{{img}}"><h3>{{name}}</h3>
-      <div class="card">
-        <div class="item item-text-wrap">
-          {{newComment}}
+  <ion-content class="comment">
+    <div class="comment-user" ng-show="newCommentFlg">
+      <div class="comment-avatar">
+        <img src="{{img}}"><h3>{{name}}</h3>
+      </div>
+      <div class="comment-body">
+        <div class="comment-content">
+          <div ng-show="newCommentFlg">
+            {{newComment}}
+          </div>
+          <div ng-hide="newCommentFlg">
+            <textarea ng-model="newComment"></textarea>
+          </div>
+        </div>
+        <div class="comment-photo" ng-hide="newCommentFlg">
+          <button class="button"><i class="ion-android-camera"></i></button>
+        </div>
+        <div class="comment-save" ng-hide="newComment">
+          <span class="comment-counter" ng-class="(newComment.length > 100) ? 'comment-error':''">{{100 - newComment.length}}</span>
+          <button class="button">Save</button>
         </div>
       </div>
     </div>
-    <div class="msg item item-thumbnail-left" ng-hide="newComment" ng-repeat="comment in comments._objs | filter: {shop_id: id} | filter: {user_id: user_id}">
-      <img src="{{commentpicture_id}}"><h3>{{comment.user_id}}</h3>
-      <div class="card">
-        <div class="item item-text-wrap">
-          {{comment.comment}}
+    <!-- others -->
+    <div class="comment-others" ng-hide="newComment">
+      <div class="comment-avatar">
+        <img src="{{img}}"><h3>{{user_id}}</h3>
+      </div>
+      <div class="comment-body">
+        <div class="comment-content">
+          <div ng-show="updateModel.commentFlg">
+            {{updateModel.updateComment}}
+          </div>
+          <div ng-hide="updateModel.commentFlg">
+            <textarea ng-model="updateModel.updateComment"></textarea>
+          </div>
+        </div>
+        <div class="comment-util" ng-hide="updateModel.commentFlg">
+          <button class="button comment-photo"><i class="ion-ios7-camera"></i></button>
+          <button class="button comment-save" ng-click="saveComment()">Save</button>
+          <span class="comment-counter" ng-class="(updateModel.updateComment.length > 100) ? 'comment-error':''">{{100 - updateModel.updateComment.length}}</span>
         </div>
       </div>
     </div>
-    <div class="msg item item-thumbnail-left" ng-repeat="comment in comments._objs | filter: {shop_id: id} | filter: {user_id: '!' + user_id}">
-      <img src="{{commentpicture_id}}"><h3>{{comment.user_id}}</h3>
-      <div class="card">
-        <div class="item item-text-wrap">
+    <!-- others -->
+    <div class="comment-others" ng-repeat="comment in comments._objs | filter: {user_id: '!' + user_id}">
+      <div class="comment-avatar">
+        <img src="{{img}}"><h3>{{comment.user_id}}</h3>
+      </div>
+      <div class="comment-body">
+        <div class="comment-content">
           {{comment.comment}}
         </div>
       </div>

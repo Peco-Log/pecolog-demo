@@ -1,4 +1,4 @@
-angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
+angular.module('pecologApp.controllers', ['ionic','pecologApp.services', 'pecologApp.models'])
 .controller('MenuController', function ($scope, $ionicSideMenuDelegate, MenuService) {
   $scope.list = MenuService.all();
   $scope.toggleLeftSideMenu = function() {
@@ -12,7 +12,7 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
       markerDataList.push({ z: shop.latitude, x: shop.longitude, id: shop._id, name: shop.name});
     });
     /* map中心の緯度・経度 */
-    var latLng = new google.maps.LatLng(shops._objs[2].latitude, shops._objs[2].longitude);
+    var latLng = new google.maps.LatLng(shops._objs[0].latitude, shops._objs[0].longitude);
     var map = MapService.map();
     map.setCenter(latLng);
 
@@ -73,12 +73,26 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
     });
   };
 })
-.controller('MessageModalController', function ($scope) {
+.controller('MessageModalController', function ($scope, UpdateModel, CommentService) {
+  $scope.updateModel = UpdateModel;
+  $scope.saveComment = function() {
+    var comment = $scope.updateModel.updateComment;
+    var deferred = CommentService.save($scope.id, comment);
+
+    deferred.then(function(data) {
+      $scope.newComment = $scope.updateModel.updateComment; 
+    });
+
+    $scope.updateModel.commentFlg = true;
+  };       
   $scope.cancel = function() {
+    $scope.updateModel.updateComment = "";
     $scope.messageModal.hide();
   };
 })
 .controller('NewShopModalController', function($scope, $rootScope, MapService, CreateShopService,  $ionicActionSheet, ModalService) {
+  $scope.userImg = 'http://ionicframework.com/img/docs/venkman.jpg';
+  $scope.userName = 'Venkman';
   $scope.newShop = {}; 
   $scope.createShop = function() {
     var z = $rootScope.marker.position.k;
@@ -94,7 +108,7 @@ angular.module('pecologApp.controllers', ['ionic','pecologApp.services'])
 
     deferred.then(function(data) {
       ModalService.attachMessage($scope, $rootScope.marker,
-        infowindow, 'templates/message.tmpl.html', newComment, data._id, data.user_id);
+        infowindow, 'templates/message.tmpl.html', newComment, data.shop_id, data.user_id);
     });
 
     $scope.modal.hide();

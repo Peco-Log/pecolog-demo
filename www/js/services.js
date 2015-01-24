@@ -1,12 +1,12 @@
 var COMMENT_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/comment/';
 var SHOP_BASE_URL = 'https://api-datastore.appiaries.com/v1/dat/_sandbox/pecolog/shop/';
 
-angular.module('pecologApp.services', [])
+angular.module('pecologApp.services', ['pecologApp.models'])
 .factory('MenuService', function () {
   var menuItems = [
     { text: 'Map', iconClass: 'icon ion-map', colour: "candy-purple-bg", link: 'map()'},
     { text: 'Friends', iconClass: 'icon ion-person-stalker', colour: "candy-pink-bg", link: 'avatars()'},
-    { text: 'About Us', iconClass: 'icon ion-woman', colour: "candy-yellow-bg", link: 'about()'}
+    { text: 'Setting', iconClass: 'icon ion-gear-b', colour: "candy-yellow-bg", link: 'about()'}
   ];
   return {
     all: function () {
@@ -21,10 +21,33 @@ angular.module('pecologApp.services', [])
     }
   };
 })
-.factory('CommentService', function ($resource) {
+.factory('CommentService', function ($resource, $q, $http) {
+  var TOKEN = 'app5aeb8f6e4ddf1b9e892f855672'; 
+  var CONTENT_TYPE = 'application/json';
+  var deferred = new $q.defer();
   return {
-    all: function () {
-      return $resource(COMMENT_BASE_URL + '-', {get: {method: 'GET'}}).get();
+    all: function (shop_id) {
+      return $resource(COMMENT_BASE_URL + '-;shop_id.eq.' + shop_id, {get: {method: 'GET'}}).get();
+    },
+    usr: function (shop_id, user_id) {
+      return $resource(COMMENT_BASE_URL + '-;shop_id.eq.' + shop_id + ';user_id.eq.' + user_id, {get: {method: 'GET'}}).get();
+    },
+    save: function(shop_id, comment) {
+      $http({
+        method: 'POST',
+        url: COMMENT_BASE_URL + '?get=true',
+        headers: {
+          'X-APPIARIES-TOKEN': TOKEN,
+          'Content-Type': CONTENT_TYPE},
+        data: {
+          shop_id: shop_id,
+          comment: comment,
+          user_id: 'ugagod'
+        }
+      }).success(function(data, status, headers, config) {
+        deferred.resolve(data);
+      }); 
+      return deferred.promise;
     }
   };
 })
@@ -70,7 +93,7 @@ angular.module('pecologApp.services', [])
     },
   };
 })
-.factory('ModalService', function ($ionicModal, $ionicActionSheet, CommentService) {
+.factory('ModalService', function ($ionicModal, $ionicActionSheet, CommentService, UpdateModel) {
   return {
     attachMessage: function($scope, marker, infowindow, url, newComment, shop_id, user_id) {
       $ionicModal.fromTemplateUrl(url, function(modal) {
@@ -81,14 +104,26 @@ angular.module('pecologApp.services', [])
         foucusFirstInput: true
       });
       google.maps.event.addListener(marker, "click", function() {
+        UpdateModel.updateComment = "";
+        UpdateModel.commentFlg = false;
         $scope.title = infowindow.getContent();
+        $scope.newCommentFlg = newComment;
         $scope.newComment = newComment;
         $scope.img = 'http://ionicframework.com/img/docs/venkman.jpg';
         $scope.name = 'Venkman';
-        $scope.comments = CommentService.all();
+        $scope.comments = CommentService.all(shop_id);
+        CommentService.usr(shop_id, user_id).$promise.then(
+          function(data) {
+            if (data._objs[0]) {
+              UpdateModel.commentFlg = true;
+              UpdateModel.updateComment = data._objs[0].comment;
+            }
+          }
+        );
         $scope.messageModal.show();
         $scope.id = shop_id;
         $scope.user_id = user_id;
+        $scope.updateModel = UpdateModel;
       });
     },
     setModalFunction: function($scope, url) {
@@ -104,7 +139,7 @@ angular.module('pecologApp.services', [])
 .factory('CreateShopService', function ($q, $http) {
   var TOKEN = 'app5aeb8f6e4ddf1b9e892f855672'; 
   var CONTENT_TYPE = 'application/json';
-  var deferred = $q.defer();
+  var deferred = new $q.defer();
   return {
     save: function(x, z, name, comment) {
       $http({
@@ -118,9 +153,6 @@ angular.module('pecologApp.services', [])
           latitude: z,
           longitude: x
       }}).success(function(data, status, headers, config) {
-        deferred.resolve(data);
-      });
-      deferred.promise.then(function(data) {
         $http({
           method: 'POST',
           url: COMMENT_BASE_URL + '?get=true',
@@ -139,7 +171,7 @@ angular.module('pecologApp.services', [])
       return deferred.promise;
     }
   }
-})  
+})
 .factory('AvatarsService', function () {
   var avatars = [
     { img: 'http://ionicframework.com/img/docs/venkman.jpg', name: 'Venkman', mention: "Back off, man. I'm a scientist.", isChecked: true},
